@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GoldVision — Gold Trading Decision Support</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">G</div>
+      <div><h1>GoldVision</h1><span>Gold Trading Support</span></div>
+    </div>
+
+    <nav>
+      <button class="nav-item active" data-page="dashboard"><span>⌂</span>Dashboard</button>
+      <button class="nav-item" data-page="forecast"><span>↗</span>Forecast</button>
+      <button class="nav-item" data-page="sentiment"><span>◉</span>Sentiment</button>
+      <button class="nav-item" data-page="news"><span>▤</span>Economic News</button>
+    </nav>
+
+    <div class="sidebar-note">
+      <span class="status-dot"></span>
+      <div><strong>Frontend Demo</strong><small>Data simulasi — siap dihubungkan ke API</small></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">GOLD MARKET</p>
+        <h2 id="page-title">Dashboard</h2>
+        <p class="subtitle" id="page-subtitle">Ringkasan harga emas, forecast, sentimen, dan keputusan bulanan.</p>
+      </div>
+      <div class="top-actions">
+        <div class="live-status"><span></span>Demo Live</div>
+        <button id="refresh-btn" class="refresh-btn">↻ Refresh</button>
+        <div class="last-update"><span>Last update</span><strong id="last-update">08 Oct 2026, 19:00 WIB</strong></div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="page active">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">MONTHLY DECISION SUPPORT</p>
+          <h3>Perlu beli, tahan, atau tunggu?</h3>
+          <p>GoldVision menggabungkan hasil forecast harga dan sentimen berita ekonomi untuk membantu membaca kondisi pasar dalam horizon satu bulan.</p>
+        </div>
+        <div class="recommendation">
+          <span>Recommendation</span>
+          <strong id="dashboard-recommendation">HOLD</strong>
+          <small>Confidence <b id="confidence">78%</b></small>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card"><span>Current Gold Price</span><strong id="current-price">$4,162.30</strong><small id="price-change" class="positive">+0.84%</small></div>
+        <div class="kpi-card"><span>Forecast Next Month</span><strong id="forecast-price">$4,215.80</strong><small id="forecast-change" class="positive">+1.29%</small></div>
+        <div class="kpi-card"><span>Sentiment Score</span><strong id="sentiment-score">0.18</strong><small id="sentiment-label">Neutral → Positive</small></div>
+        <div class="kpi-card"><span>News Analyzed</span><strong id="news-count">1,248</strong><small>Latest period</small></div>
+      </div>
+
+      <div class="content-grid">
+        <div class="card chart-card">
+          <div class="card-header">
+            <div><h3>Gold Price Movement</h3><p>Historical price and forecast</p></div>
+            <span class="badge">XAU/USD</span>
+          </div>
+          <div class="period-tabs">
+            <button class="period-btn active" data-period="7M">7M</button>
+            <button class="period-btn" data-period="1Y">1Y</button>
+            <button class="period-btn" data-period="5Y">5Y</button>
+          </div>
+          <div class="chart-wrap"><canvas id="goldChart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div><h3>Market Signal</h3><p>Ringkasan hasil sistem</p></div></div>
+          <div class="signal-box">
+            <span class="signal-label">Current signal</span>
+            <strong id="signal-text">HOLD</strong>
+            <p id="signal-description">Forecast naik moderat, tetapi sentimen belum cukup kuat untuk mendorong BUY.</p>
+          </div>
+          <div class="mini-row"><span>Forecast</span><strong id="signal-forecast">+1.29%</strong></div>
+          <div class="mini-row"><span>Sentiment</span><strong id="signal-sentiment">Positive</strong></div>
+          <div class="mini-row"><span>Economic condition</span><strong id="signal-economic">Moderate</strong></div>
+        </div>
+      </div>
+
+      <div class="bottom-grid">
+        <div class="card">
+          <div class="card-header"><div><h3>Economic Factors</h3><p>Faktor yang dipantau sistem</p></div></div>
+          <div class="factor-list">
+            <div class="factor"><div><b>Federal Reserve</b><small>Interest rate outlook</small></div><strong>Moderate</strong></div>
+            <div class="factor"><div><b>CPI</b><small>Inflation pressure</small></div><strong>High</strong></div>
+            <div class="factor"><div><b>NFP</b><small>Labor market</small></div><strong>Strong</strong></div>
+            <div class="factor"><div><b>PCE</b><small>Fed preferred inflation gauge</small></div><strong>Neutral</strong></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div><h3>Recent Economic News</h3><p>Headline yang telah dianalisis FinBERT</p></div><button class="link-btn" data-page-link="news">View all →</button></div>
+          <div id="recent-news"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORECAST -->
+    <section id="forecast" class="page">
+      <div class="section-intro"><p class="eyebrow">XGBOOST</p><h3>Gold Price Forecast</h3><p>Hasil prediksi harga/return bulanan yang nantinya dikirim backend.</p></div>
+      <div class="kpi-grid three">
+        <div class="kpi-card"><span>Predicted Price</span><strong>$4,215.80</strong><small class="positive">+1.29% expected change</small></div>
+        <div class="kpi-card"><span>Forecast Horizon</span><strong>1 Month</strong><small>Next period</small></div>
+        <div class="kpi-card"><span>Model</span><strong>XGBoost</strong><small>Time-series features</small></div>
+      </div>
+      <div class="content-grid">
+        <div class="card chart-card"><div class="card-header"><div><h3>Actual vs Forecast</h3><p>Historical and predicted gold price</p></div></div><div class="chart-wrap"><canvas id="forecastChart"></canvas></div></div>
+        <div class="card"><div class="card-header"><div><h3>How it is used</h3><p>Output untuk decision layer</p></div></div><div class="flow"><div><span>01</span><b>Gold data</b><small>Historical price + lag features</small></div><div><span>02</span><b>XGBoost</b><small>Predict next-month return</small></div><div><span>03</span><b>Decision Rule</b><small>Combine forecast + sentiment</small></div><div><span>04</span><b>BUY / HOLD / SELL</b><small>Final decision support</small></div></div></div>
+      </div>
+    </section>
+
+    <!-- SENTIMENT -->
+    <section id="sentiment" class="page">
+      <div class="section-intro"><p class="eyebrow">FINBERT</p><h3>News Sentiment</h3><p>Sentimen berita ekonomi AS yang menjadi salah satu input untuk decision layer.</p></div>
+      <div class="content-grid">
+        <div class="card chart-card"><div class="card-header"><div><h3>Daily Sentiment Score</h3><p>Average score per day</p></div><span class="badge">-1 to +1</span></div><div class="chart-wrap"><canvas id="sentimentChart"></canvas></div></div>
+        <div class="card"><div class="card-header"><div><h3>Sentiment Distribution</h3><p>Latest analyzed period</p></div></div><div class="sentiment-bars"><div><div><span>Positive</span><b>44%</b></div><i><em style="width:44%"></em></i></div><div><div><span>Neutral</span><b>31%</b></div><i><em style="width:31%"></em></i></div><div><div><span>Negative</span><b>25%</b></div><i><em style="width:25%"></em></i></div></div><div class="sentiment-status"><span>Overall sentiment</span><strong>Neutral → Positive</strong><small>Sentiment score: +0.18</small></div></div>
+      </div>
+    </section>
+
+    <!-- NEWS -->
+    <section id="news" class="page">
+      <div class="section-intro"><p class="eyebrow">ECONOMIC NEWS</p><h3>News Monitor</h3><p>Daftar berita ekonomi yang nantinya berasal dari sumber real-time backend.</p></div>
+      <div class="card">
+        <div class="news-toolbar"><input id="news-search" type="text" placeholder="Search headline..."><select id="news-filter"><option value="all">All categories</option><option value="FED/FOMC">Fed / FOMC</option><option value="INFLATION">Inflation</option><option value="JOBS/NFP">Jobs / NFP</option><option value="TREASURY">Treasury</option><option value="MARKET">Market</option><option value="ECONOMY">Economy</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Time</th><th>Headline</th><th>Category</th><th>Sentiment</th></tr></thead><tbody id="news-table"></tbody></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="data/mock-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
